@@ -12,6 +12,16 @@ module.exports = {
 
   devtool: 'source-map',
 
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: 'babel-loader',
+      },
+    ],
+  },
+
   plugins: [
     new CopyPlugin({
       patterns: [
