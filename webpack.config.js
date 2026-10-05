@@ -1,12 +1,13 @@
 const path = require('node:path');
 const CopyPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/main.js',
 
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'bundle.js',
+    filename: 'bundle.[contenthash].js',
     clean: true,
   },
 
@@ -28,8 +29,14 @@ module.exports = {
         {
           from: 'public',
           to: '.',
+          globOptions: {
+            ignore: ['**/index.html'],
+          },
         },
       ],
+    }),
+    new HtmlWebpackPlugin({
+      template: './public/index.html',
     }),
   ],
 };
