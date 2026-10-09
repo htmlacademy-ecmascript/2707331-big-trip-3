@@ -1,4 +1,4 @@
-import {RenderPosition, render} from './render.js';
+import { RenderPosition, render } from './render.js';
 import FilterView from './view/filter.js';
 import SortView from './view/sort.js';
 import FormNewView from './view/form-new.js';
