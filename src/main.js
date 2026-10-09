@@ -4,6 +4,7 @@ import SortView from './view/sort.js';
 import FormNewView from './view/form-new.js';
 import FormEditView from './view/form-edit.js';
 import RoutePointView from './view/route-point.js';
+import EventsListView from './view/events-list.js';
 
 const tripControlsContainer = document.querySelector('.trip-controls__filters');
 render(new FilterView(), tripControlsContainer);
@@ -11,13 +12,12 @@ render(new FilterView(), tripControlsContainer);
 const tripEventsContainer = document.querySelector('.trip-events');
 render(new SortView(), tripEventsContainer, RenderPosition.AFTERBEGIN);
 
-const eventsList = document.createElement('ul');
-eventsList.classList.add('trip-events__list');
-tripEventsContainer.append(eventsList);
+const eventsList = new EventsListView();
+render(eventsList, tripEventsContainer);
 
-render(new FormEditView(), eventsList);
-render(new FormNewView(), eventsList);
+render(new FormEditView(), eventsList.getElement());
+render(new FormNewView(), eventsList.getElement());
 
 for (let i = 0; i < 3; i++) {
-  render(new RoutePointView(), eventsList);
+  render(new RoutePointView(), eventsList.getElement());
 }
