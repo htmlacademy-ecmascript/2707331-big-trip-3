@@ -1,10 +1,10 @@
 import { RenderPosition, render } from './render.js';
-import FilterView from './view/filter.js';
-import SortView from './view/sort.js';
-import FormNewView from './view/form-new.js';
-import FormEditView from './view/form-edit.js';
-import RoutePointView from './view/route-point.js';
-import EventsListView from './view/events-list.js';
+import FilterView from './view/filter-view.js';
+import SortView from './view/sort-view.js';
+import FormNewView from './view/form-new-view.js';
+import FormEditView from './view/form-edit-view.js';
+import PointView from './view/point-view.js';
+import EventsListView from './view/events-list-view.js';
 import Model from './model/model.js';
 
 const model = new Model();
@@ -30,8 +30,5 @@ render(
 );
 
 points.forEach((point) => {
-  render(
-    new RoutePointView(point, destinations, offers),
-    eventsList.getElement(),
-  );
+  render(new PointView(point, destinations, offers), eventsList.getElement());
 });
