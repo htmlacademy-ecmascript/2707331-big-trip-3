@@ -1,7 +1,94 @@
 import { createElement } from '../render.js';
+import { POINT_TYPES } from '../mock/point.js';
+
+const formatDateTime = (date) => {
+  if (!date) {
+    return '';
+  }
+
+  const value = new Date(date);
+  const pad = (number) => String(number).padStart(2, '0');
+
+  return `${pad(value.getDate())}/${pad(value.getMonth() + 1)}/${String(
+    value.getFullYear(),
+  ).slice(-2)} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
+};
 
 export default class FormEditView {
+  constructor(point = null, destinations = [], offers = []) {
+    this.point = point;
+    this.destinations = destinations;
+    this.offers = offers;
+  }
+
   getTemplate() {
+    const point = this.point ?? {
+      type: 'flight',
+      destination: '',
+      dateFrom: '',
+      dateTo: '',
+      basePrice: '',
+      offers: [],
+      isFavorite: false,
+    };
+
+    const destination = this.destinations.find(
+      (item) => item.id === point.destination,
+    );
+
+    const availableOffers = this.offers.filter(
+      (offer) => offer.type === point.type,
+    );
+
+    const typeOptions = POINT_TYPES.map(
+      (type) => `
+        <div class="event__type-item">
+          <input
+            class="event__type-input visually-hidden"
+            id="event-type-${type}-1"
+            name="event-type"
+            type="radio"
+            value="${type}"
+            ${point.type === type ? 'checked' : ''}
+          />
+          <label
+            class="event__type-label event__type-label--${type}"
+            for="event-type-${type}-1"
+          >
+            ${type[0].toUpperCase() + type.slice(1)}
+          </label>
+        </div>
+      `,
+    ).join('');
+
+    const destinationOptions = this.destinations
+      .map((item) => `<option value="${item.name}"></option>`)
+      .join('');
+
+    const offersTemplate = availableOffers
+      .map(
+        (offer) => `
+        <div class="event__offer-selector">
+          <input
+            class="event__offer-checkbox visually-hidden"
+            id="event-offer-${offer.id}"
+            name="event-offer-${offer.id}"
+            type="checkbox"
+            ${point.offers.includes(offer.id) ? 'checked' : ''}
+          />
+          <label
+            class="event__offer-label"
+            for="event-offer-${offer.id}"
+          >
+            <span class="event__offer-title">${offer.title}</span>
+            +€
+            <span class="event__offer-price">${offer.price}</span>
+          </label>
+        </div>
+      `,
+      )
+      .join('');
+
     return /* HTML */ `<li class="trip-events__item">
       <form action="#" class="event event--edit" method="post">
         <header class="event__header">
@@ -10,12 +97,12 @@ export default class FormEditView {
               class="event__type event__type-btn"
               for="event-type-toggle-1"
             >
-              <span class="visually-hidden"> Choose event type </span>
+              <span class="visually-hidden">Choose event type</span>
               <img
                 alt="Event type icon"
                 class="event__type-icon"
                 height="17"
-                src="img/icons/flight.png"
+                src="img/icons/${point.type}.png"
                 width="17"
               />
             </label>
@@ -27,151 +114,17 @@ export default class FormEditView {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                <div class="event__type-item">
-                  <input
-                    class="event__type-input visually-hidden"
-                    id="event-type-taxi-1"
-                    name="event-type"
-                    type="radio"
-                    value="taxi"
-                  />
-                  <label
-                    class="event__type-label event__type-label--taxi"
-                    for="event-type-taxi-1"
-                  >
-                    Taxi
-                  </label>
-                </div>
-                <div class="event__type-item">
-                  <input
-                    class="event__type-input visually-hidden"
-                    id="event-type-bus-1"
-                    name="event-type"
-                    type="radio"
-                    value="bus"
-                  />
-                  <label
-                    class="event__type-label event__type-label--bus"
-                    for="event-type-bus-1"
-                  >
-                    Bus
-                  </label>
-                </div>
-                <div class="event__type-item">
-                  <input
-                    class="event__type-input visually-hidden"
-                    id="event-type-train-1"
-                    name="event-type"
-                    type="radio"
-                    value="train"
-                  />
-                  <label
-                    class="event__type-label event__type-label--train"
-                    for="event-type-train-1"
-                  >
-                    Train
-                  </label>
-                </div>
-                <div class="event__type-item">
-                  <input
-                    class="event__type-input visually-hidden"
-                    id="event-type-ship-1"
-                    name="event-type"
-                    type="radio"
-                    value="ship"
-                  />
-                  <label
-                    class="event__type-label event__type-label--ship"
-                    for="event-type-ship-1"
-                  >
-                    Ship
-                  </label>
-                </div>
-                <div class="event__type-item">
-                  <input
-                    class="event__type-input visually-hidden"
-                    id="event-type-drive-1"
-                    name="event-type"
-                    type="radio"
-                    value="drive"
-                  />
-                  <label
-                    class="event__type-label event__type-label--drive"
-                    for="event-type-drive-1"
-                  >
-                    Drive
-                  </label>
-                </div>
-                <div class="event__type-item">
-                  <input
-                    checked=""
-                    class="event__type-input visually-hidden"
-                    id="event-type-flight-1"
-                    name="event-type"
-                    type="radio"
-                    value="flight"
-                  />
-                  <label
-                    class="event__type-label event__type-label--flight"
-                    for="event-type-flight-1"
-                  >
-                    Flight
-                  </label>
-                </div>
-                <div class="event__type-item">
-                  <input
-                    class="event__type-input visually-hidden"
-                    id="event-type-check-in-1"
-                    name="event-type"
-                    type="radio"
-                    value="check-in"
-                  />
-                  <label
-                    class="event__type-label event__type-label--check-in"
-                    for="event-type-check-in-1"
-                  >
-                    Check-in
-                  </label>
-                </div>
-                <div class="event__type-item">
-                  <input
-                    class="event__type-input visually-hidden"
-                    id="event-type-sightseeing-1"
-                    name="event-type"
-                    type="radio"
-                    value="sightseeing"
-                  />
-                  <label
-                    class="event__type-label event__type-label--sightseeing"
-                    for="event-type-sightseeing-1"
-                  >
-                    Sightseeing
-                  </label>
-                </div>
-                <div class="event__type-item">
-                  <input
-                    class="event__type-input visually-hidden"
-                    id="event-type-restaurant-1"
-                    name="event-type"
-                    type="radio"
-                    value="restaurant"
-                  />
-                  <label
-                    class="event__type-label event__type-label--restaurant"
-                    for="event-type-restaurant-1"
-                  >
-                    Restaurant
-                  </label>
-                </div>
+                ${typeOptions}
               </fieldset>
             </div>
           </div>
+
           <div class="event__field-group event__field-group--destination">
             <label
               class="event__label event__type-output"
               for="event-destination-1"
             >
-              Flight
+              ${point.type[0].toUpperCase() + point.type.slice(1)}
             </label>
             <input
               class="event__input event__input--destination"
@@ -179,14 +132,11 @@ export default class FormEditView {
               list="destination-list-1"
               name="event-destination"
               type="text"
-              value="Chamonix"
+              value="${destination?.name ?? ''}"
             />
-            <datalist id="destination-list-1">
-              <option value="Amsterdam"></option>
-              <option value="Geneva"></option>
-              <option value="Chamonix"></option>
-            </datalist>
+            <datalist id="destination-list-1">${destinationOptions}</datalist>
           </div>
+
           <div class="event__field-group event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">
               From
@@ -196,7 +146,7 @@ export default class FormEditView {
               id="event-start-time-1"
               name="event-start-time"
               type="text"
-              value="18/03/19 12:25"
+              value="${formatDateTime(point.dateFrom)}"
             />
             —
             <label class="visually-hidden" for="event-end-time-1"> To </label>
@@ -205,12 +155,13 @@ export default class FormEditView {
               id="event-end-time-1"
               name="event-end-time"
               type="text"
-              value="18/03/19 13:35"
+              value="${formatDateTime(point.dateTo)}"
             />
           </div>
+
           <div class="event__field-group event__field-group--price">
             <label class="event__label" for="event-price-1">
-              <span class="visually-hidden"> Price </span>
+              <span class="visually-hidden">Price</span>
               €
             </label>
             <input
@@ -218,106 +169,40 @@ export default class FormEditView {
               id="event-price-1"
               name="event-price"
               type="text"
-              value="160"
+              value="${point.basePrice}"
             />
           </div>
+
           <button class="event__save-btn btn btn--blue" type="submit">
             Save
           </button>
-          <button class="event__reset-btn" type="reset">Delete</button>
+          <button class="event__reset-btn" type="reset">
+            ${this.point ? 'Delete' : 'Cancel'}
+          </button>
           <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden"> Open event </span>
+            <span class="visually-hidden">Close event</span>
           </button>
         </header>
+
         <section class="event__details">
           <section class="event__section event__section--offers">
             <h3 class="event__section-title event__section-title--offers">
               Offers
             </h3>
-            <div class="event__available-offers">
-              <div class="event__offer-selector">
-                <input
-                  checked=""
-                  class="event__offer-checkbox visually-hidden"
-                  id="event-offer-luggage-1"
-                  name="event-offer-luggage"
-                  type="checkbox"
-                />
-                <label class="event__offer-label" for="event-offer-luggage-1">
-                  <span class="event__offer-title"> Add luggage </span>
-                  +€
-                  <span class="event__offer-price"> 50 </span>
-                </label>
-              </div>
-              <div class="event__offer-selector">
-                <input
-                  checked=""
-                  class="event__offer-checkbox visually-hidden"
-                  id="event-offer-comfort-1"
-                  name="event-offer-comfort"
-                  type="checkbox"
-                />
-                <label class="event__offer-label" for="event-offer-comfort-1">
-                  <span class="event__offer-title"> Switch to comfort </span>
-                  +€
-                  <span class="event__offer-price"> 80 </span>
-                </label>
-              </div>
-              <div class="event__offer-selector">
-                <input
-                  class="event__offer-checkbox visually-hidden"
-                  id="event-offer-meal-1"
-                  name="event-offer-meal"
-                  type="checkbox"
-                />
-                <label class="event__offer-label" for="event-offer-meal-1">
-                  <span class="event__offer-title"> Add meal </span>
-                  +€
-                  <span class="event__offer-price"> 15 </span>
-                </label>
-              </div>
-              <div class="event__offer-selector">
-                <input
-                  class="event__offer-checkbox visually-hidden"
-                  id="event-offer-seats-1"
-                  name="event-offer-seats"
-                  type="checkbox"
-                />
-                <label class="event__offer-label" for="event-offer-seats-1">
-                  <span class="event__offer-title"> Choose seats </span>
-                  +€
-                  <span class="event__offer-price"> 5 </span>
-                </label>
-              </div>
-              <div class="event__offer-selector">
-                <input
-                  class="event__offer-checkbox visually-hidden"
-                  id="event-offer-train-1"
-                  name="event-offer-train"
-                  type="checkbox"
-                />
-                <label class="event__offer-label" for="event-offer-train-1">
-                  <span class="event__offer-title"> Travel by train </span>
-                  +€
-                  <span class="event__offer-price"> 40 </span>
-                </label>
-              </div>
-            </div>
+            <div class="event__available-offers">${offersTemplate}</div>
           </section>
+
           <section class="event__section event__section--destination">
             <h3 class="event__section-title event__section-title--destination">
               Destination
             </h3>
             <p class="event__destination-description">
-              Chamonix-Mont-Blanc (usually shortened to Chamonix) is a resort
-              area near the junction of France, Switzerland and Italy. At the
-              base of Mont Blanc, the highest summit in the Alps, it's renowned
-              for its skiing.
+              ${destination?.description ?? ''}
             </p>
           </section>
         </section>
       </form>
-    </li> `;
+    </li>`;
   }
 
   getElement() {
