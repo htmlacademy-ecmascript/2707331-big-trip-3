@@ -19,11 +19,23 @@ export default class FormEditView extends AbstractView {
   #destinations;
   #offers;
 
-  constructor(point = null, destinations = [], offers = []) {
+  constructor(
+    point = null,
+    destinations = [],
+    offers = [],
+    onFormSubmit,
+    onRollupClick,
+  ) {
     super();
     this.#point = point;
     this.#destinations = destinations;
     this.#offers = offers;
+
+    this.element.querySelector('form').addEventListener('submit', onFormSubmit);
+
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', onRollupClick);
   }
 
   get template() {

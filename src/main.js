@@ -1,4 +1,4 @@
-import { RenderPosition, render } from './framework/render.js';
+import { RenderPosition, render, replace } from './framework/render.js';
 import FilterView from './view/filter-view.js';
 import SortView from './view/sort-view.js';
 import FormNewView from './view/form-new-view.js';
@@ -24,8 +24,39 @@ render(eventsList, tripEventsContainer);
 
 render(new FormNewView(), eventsList.element);
 
-render(new FormEditView(points[0], destinations, offers), eventsList.element);
-
 points.forEach((point) => {
-  render(new PointView(point, destinations, offers), eventsList.element);
+  const pointView = new PointView(point, destinations, offers, onRollupClick);
+
+  const formEditView = new FormEditView(
+    point,
+    destinations,
+    offers,
+    onFormSubmit,
+    onEditFormRollupClick,
+  );
+
+  function onRollupClick() {
+    replace(formEditView, pointView);
+    document.addEventListener('keydown', onEscKeydown);
+  }
+
+  function onEditFormRollupClick() {
+    replace(pointView, formEditView);
+    document.removeEventListener('keydown', onEscKeydown);
+  }
+
+  function onFormSubmit(evt) {
+    evt.preventDefault();
+    replace(pointView, formEditView);
+    document.removeEventListener('keydown', onEscKeydown);
+  }
+
+  function onEscKeydown(evt) {
+    if (evt.key === 'Escape') {
+      replace(pointView, formEditView);
+      document.removeEventListener('keydown', onEscKeydown);
+    }
+  }
+
+  render(pointView, eventsList.element);
 });
