@@ -1,4 +1,4 @@
-import { RenderPosition, render } from './render.js';
+import { RenderPosition, render } from './framework/render.js';
 import FilterView from './view/filter-view.js';
 import SortView from './view/sort-view.js';
 import FormNewView from './view/form-new-view.js';
@@ -22,13 +22,10 @@ render(new SortView(), tripEventsContainer, RenderPosition.AFTERBEGIN);
 const eventsList = new EventsListView();
 render(eventsList, tripEventsContainer);
 
-render(new FormNewView(), eventsList.getElement());
+render(new FormNewView(), eventsList.element);
 
-render(
-  new FormEditView(points[0], destinations, offers),
-  eventsList.getElement(),
-);
+render(new FormEditView(points[0], destinations, offers), eventsList.element);
 
 points.forEach((point) => {
-  render(new PointView(point, destinations, offers), eventsList.getElement());
+  render(new PointView(point, destinations, offers), eventsList.element);
 });

@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { POINT_TYPES } from '../mock/point.js';
 
 const formatDateTime = (date) => {
@@ -14,15 +14,20 @@ const formatDateTime = (date) => {
   ).slice(-2)} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
 };
 
-export default class FormEditView {
+export default class FormEditView extends AbstractView {
+  #point;
+  #destinations;
+  #offers;
+
   constructor(point = null, destinations = [], offers = []) {
-    this.point = point;
-    this.destinations = destinations;
-    this.offers = offers;
+    super();
+    this.#point = point;
+    this.#destinations = destinations;
+    this.#offers = offers;
   }
 
-  getTemplate() {
-    const point = this.point ?? {
+  get template() {
+    const point = this.#point ?? {
       type: 'flight',
       destination: '',
       dateFrom: '',
@@ -32,11 +37,11 @@ export default class FormEditView {
       isFavorite: false,
     };
 
-    const destination = this.destinations.find(
+    const destination = this.#destinations.find(
       (item) => item.id === point.destination,
     );
 
-    const availableOffers = this.offers.filter(
+    const availableOffers = this.#offers.filter(
       (offer) => offer.type === point.type,
     );
 
@@ -61,7 +66,7 @@ export default class FormEditView {
       `,
     ).join('');
 
-    const destinationOptions = this.destinations
+    const destinationOptions = this.#destinations
       .map((item) => `<option value="${item.name}"></option>`)
       .join('');
 
@@ -177,7 +182,7 @@ export default class FormEditView {
             Save
           </button>
           <button class="event__reset-btn" type="reset">
-            ${this.point ? 'Delete' : 'Cancel'}
+            ${this.#point ? 'Delete' : 'Cancel'}
           </button>
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Close event</span>
@@ -203,13 +208,5 @@ export default class FormEditView {
         </section>
       </form>
     </li>`;
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
   }
 }
