@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const formatDate = (date) =>
   new Intl.DateTimeFormat('en-GB', {
@@ -33,23 +33,32 @@ const formatDuration = (dateFrom, dateTo) => {
   return `${remainingMinutes}M`;
 };
 
-export default class RoutePointView {
-  constructor(point, destinations, offers) {
-    this.point = point;
-    this.destinations = destinations;
-    this.offers = offers;
+export default class PointView extends AbstractView {
+  #point;
+  #destinations;
+  #offers;
+
+  constructor(point, destinations, offers, onRollupClick) {
+    super();
+    this.#point = point;
+    this.#destinations = destinations;
+    this.#offers = offers;
+
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', onRollupClick);
   }
 
-  getTemplate() {
+  get template() {
     const { type, destination, dateFrom, dateTo, basePrice, isFavorite } =
-      this.point;
+      this.#point;
 
-    const destinationData = this.destinations.find(
+    const destinationData = this.#destinations.find(
       (item) => item.id === destination,
     );
 
-    const selectedOffers = this.offers.filter((offer) =>
-      this.point.offers.includes(offer.id),
+    const selectedOffers = this.#offers.filter((offer) =>
+      this.#point.offers.includes(offer.id),
     );
 
     const eventType = type[0].toUpperCase() + type.slice(1);
@@ -122,13 +131,5 @@ export default class RoutePointView {
         </button>
       </div>
     </li>`;
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
   }
 }
