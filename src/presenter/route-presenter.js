@@ -22,12 +22,17 @@ export default class RoutePresenter {
         offers: this.#offers,
         container: this.#container,
         onDataChange: this.#handlePointChange,
+        onEditStart: this.#resetAllPointPresenters,
       });
 
       this.#pointPresenters.push(pointPresenter);
       pointPresenter.init();
     });
   }
+
+  #resetAllPointPresenters = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
 
   #handlePointChange = (updatedPoint) => {
     const pointIndex = this.#points.findIndex(

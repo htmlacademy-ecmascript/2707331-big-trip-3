@@ -10,13 +10,23 @@ export default class PointPresenter {
   #onDataChange;
   #pointView = null;
   #formEditView = null;
+  #onEditStart;
+  #isEditing = false;
 
-  constructor({ point, destinations, offers, container, onDataChange }) {
+  constructor({
+    point,
+    destinations,
+    offers,
+    container,
+    onDataChange,
+    onEditStart,
+  }) {
     this.#point = point;
     this.#destinations = destinations;
     this.#offers = offers;
     this.#container = container;
     this.#onDataChange = onDataChange;
+    this.#onEditStart = onEditStart;
   }
 
   init() {
@@ -52,30 +62,47 @@ export default class PointPresenter {
     replace(this.#pointView, previousPointView);
   }
 
+  resetView() {
+    if (!this.#isEditing) {
+      return;
+    }
+
+    replace(this.#pointView, this.#formEditView);
+    document.removeEventListener('keydown', this.#handleEscKeydown);
+    this.#isEditing = false;
+  }
+
   #handleFavoriteClick = (updatedPoint) => {
     this.#onDataChange(updatedPoint);
   };
 
   #handleRollupClick = () => {
+    this.#onEditStart();
+
     replace(this.#formEditView, this.#pointView);
+    this.#isEditing = true;
+
     document.addEventListener('keydown', this.#handleEscKeydown);
   };
 
   #handleEditFormRollupClick = () => {
     replace(this.#pointView, this.#formEditView);
     document.removeEventListener('keydown', this.#handleEscKeydown);
+    this.#isEditing = false;
   };
 
   #handleFormSubmit = (evt) => {
     evt.preventDefault();
     replace(this.#pointView, this.#formEditView);
     document.removeEventListener('keydown', this.#handleEscKeydown);
+    this.#isEditing = false;
   };
 
   #handleEscKeydown = (evt) => {
     if (evt.key === 'Escape') {
       replace(this.#pointView, this.#formEditView);
       document.removeEventListener('keydown', this.#handleEscKeydown);
+      this.#isEditing = false;
     }
   };
 }
