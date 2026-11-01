@@ -5,6 +5,7 @@ export default class RoutePresenter {
   #points;
   #destinations;
   #offers;
+  #pointPresenters = [];
 
   constructor({ container, points, destinations, offers }) {
     this.#container = container;
@@ -20,9 +21,24 @@ export default class RoutePresenter {
         destinations: this.#destinations,
         offers: this.#offers,
         container: this.#container,
+        onDataChange: this.#handlePointChange,
       });
 
+      this.#pointPresenters.push(pointPresenter);
       pointPresenter.init();
     });
   }
+
+  #handlePointChange = (updatedPoint) => {
+    const pointIndex = this.#points.findIndex(
+      (point) => point.id === updatedPoint.id,
+    );
+
+    if (pointIndex === -1) {
+      return;
+    }
+
+    Object.assign(this.#points[pointIndex], updatedPoint);
+    this.#pointPresenters[pointIndex].update(this.#points[pointIndex]);
+  };
 }

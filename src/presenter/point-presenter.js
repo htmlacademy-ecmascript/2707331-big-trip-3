@@ -7,23 +7,20 @@ export default class PointPresenter {
   #destinations;
   #offers;
   #container;
+  #onDataChange;
   #pointView = null;
   #formEditView = null;
 
-  constructor({ point, destinations, offers, container }) {
+  constructor({ point, destinations, offers, container, onDataChange }) {
     this.#point = point;
     this.#destinations = destinations;
     this.#offers = offers;
     this.#container = container;
+    this.#onDataChange = onDataChange;
   }
 
   init() {
-    this.#pointView = new PointView(
-      this.#point,
-      this.#destinations,
-      this.#offers,
-      this.#handleRollupClick,
-    );
+    this.#pointView = this.#createPointView();
 
     this.#formEditView = new FormEditView(
       this.#point,
@@ -35,6 +32,29 @@ export default class PointPresenter {
 
     render(this.#pointView, this.#container);
   }
+
+  #createPointView() {
+    return new PointView(
+      this.#point,
+      this.#destinations,
+      this.#offers,
+      this.#handleRollupClick,
+      this.#handleFavoriteClick,
+    );
+  }
+
+  update(point) {
+    this.#point = point;
+
+    const previousPointView = this.#pointView;
+    this.#pointView = this.#createPointView();
+
+    replace(this.#pointView, previousPointView);
+  }
+
+  #handleFavoriteClick = (updatedPoint) => {
+    this.#onDataChange(updatedPoint);
+  };
 
   #handleRollupClick = () => {
     replace(this.#formEditView, this.#pointView);
