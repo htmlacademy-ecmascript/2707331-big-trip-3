@@ -21,7 +21,7 @@ render(new SortView(), tripEventsContainer, RenderPosition.AFTERBEGIN);
 const eventsList = new EventsListView();
 render(eventsList, tripEventsContainer);
 
-render(new FormNewView(), eventsList.element);
+render(new FormNewView(destinations, offers), eventsList.element);
 
 const routePresenter = new RoutePresenter({
   container: eventsList.element,
