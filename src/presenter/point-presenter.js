@@ -2,6 +2,20 @@ import { render, replace } from '../framework/render.js';
 import FormEditView from '../view/form-edit-view.js';
 import PointView from '../view/point-view.js';
 
+const parseDateTime = (value) => {
+  const [date, time] = value.split(' ');
+  const [day, month, year] = date.split('/');
+  const [hours, minutes] = time.split(':');
+
+  return new Date(
+    2000 + Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hours),
+    Number(minutes),
+  );
+};
+
 export default class PointPresenter {
   #point;
   #destinations;
@@ -59,6 +73,13 @@ export default class PointPresenter {
     const previousPointView = this.#pointView;
     this.#pointView = this.#createPointView();
 
+    if (this.#isEditing) {
+      replace(this.#pointView, this.#formEditView);
+      document.removeEventListener('keydown', this.#handleEscKeydown);
+      this.#isEditing = false;
+      return;
+    }
+
     replace(this.#pointView, previousPointView);
   }
 
@@ -93,9 +114,34 @@ export default class PointPresenter {
 
   #handleFormSubmit = (evt) => {
     evt.preventDefault();
-    replace(this.#pointView, this.#formEditView);
-    document.removeEventListener('keydown', this.#handleEscKeydown);
-    this.#isEditing = false;
+
+    const form = this.#formEditView.element.querySelector('form');
+    const formData = new FormData(form);
+
+    const destination = this.#destinations.find(
+      (item) => item.name === formData.get('event-destination'),
+    );
+
+    if (!destination) {
+      return;
+    }
+
+    const selectedOffers = Array.from(
+      form.querySelectorAll('.event__offer-checkbox:checked'),
+      (input) => input.dataset.offerId,
+    );
+
+    const updatedPoint = {
+      ...this.#point,
+      type: form.querySelector('[name="event-type"]:checked').value,
+      destination: destination.id,
+      dateFrom: parseDateTime(formData.get('event-start-time')),
+      dateTo: parseDateTime(formData.get('event-end-time')),
+      basePrice: Number(formData.get('event-price')),
+      offers: selectedOffers,
+    };
+
+    this.#onDataChange(updatedPoint);
   };
 
   #handleEscKeydown = (evt) => {
