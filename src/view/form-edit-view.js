@@ -50,6 +50,8 @@ export default class FormEditView extends AbstractStatefulView {
       type: point?.type ?? 'flight',
       offers: point?.offers ?? [],
       destination: point?.destination ?? '',
+      destinationName:
+        destinations.find((item) => item.id === point?.destination)?.name ?? '',
     };
 
     this._restoreHandlers();
@@ -69,9 +71,11 @@ export default class FormEditView extends AbstractStatefulView {
     const type = this._state.type;
     const selectedOffers = this._state.offers;
 
-    const destination = this.#destinations.find(
-      (item) => item.id === this._state.destination,
-    );
+    const destination =
+      this.#destinations.find((item) => item.id === this._state.destination) ??
+      this.#destinations.find(
+        (item) => item.name === this._state.destinationName,
+      );
 
     const picturesTemplate = (destination?.pictures ?? [])
       .map(
@@ -185,7 +189,7 @@ export default class FormEditView extends AbstractStatefulView {
                 list="${this.#id}-destination-list"
                 name="event-destination"
                 type="text"
-                value="${destination?.name ?? ''}"
+                value="${this._state.destinationName ?? destination?.name ?? ''}"
               />
               <datalist id="${this.#id}-destination-list">
                 ${destinationOptions}
@@ -310,6 +314,7 @@ export default class FormEditView extends AbstractStatefulView {
       basePrice: formData.get('event-price'),
       dateFrom: formData.get('event-start-time'),
       dateTo: formData.get('event-end-time'),
+      destinationName: formData.get('event-destination'),
     });
   }
 
