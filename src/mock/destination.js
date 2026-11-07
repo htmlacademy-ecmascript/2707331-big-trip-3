@@ -7,7 +7,7 @@ const createDestination = () => ({
   description: 'A beautiful city with picturesque canals.',
   pictures: [
     {
-      src: `https://loremflickr.com/248/152?random=${getRandomInteger(1, 1000)}`,
+      src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
       description: 'Amsterdam',
     },
   ],
