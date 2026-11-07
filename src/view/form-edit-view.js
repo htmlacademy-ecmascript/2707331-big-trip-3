@@ -31,6 +31,11 @@ export default class FormEditView extends AbstractStatefulView {
     this.#destinations = destinations;
     this.#offers = offers;
 
+    this._state = {
+      type: point?.type ?? 'flight',
+      offers: point?.offers ?? [],
+    };
+
     this.element.querySelector('form').addEventListener('submit', onFormSubmit);
 
     this.element
@@ -49,33 +54,34 @@ export default class FormEditView extends AbstractStatefulView {
       isFavorite: false,
     };
 
+    const type = this._state.type;
+    const selectedOffers = this._state.offers;
+
     const destination = this.#destinations.find(
       (item) => item.id === point.destination,
     );
 
-    const availableOffers = this.#offers.filter(
-      (offer) => offer.type === point.type,
-    );
+    const availableOffers = this.#offers.filter((offer) => offer.type === type);
 
     const typeOptions = POINT_TYPES.map(
-      (type) => `
+      (pointType) => `
         <div class="event__type-item">
           <input
             class="event__type-input visually-hidden"
-            id="event-type-${type}-1"
+            id="event-type-${pointType}-1"
             name="event-type"
             type="radio"
-            value="${type}"
-            ${point.type === type ? 'checked' : ''}
-          />
-          <label
-            class="event__type-label event__type-label--${type}"
-            for="event-type-${type}-1"
-          >
-            ${type[0].toUpperCase() + type.slice(1)}
-          </label>
-        </div>
-      `,
+          value="${pointType}"
+          ${type === pointType ? 'checked' : ''}
+        />
+        <label
+          class="event__type-label event__type-label--${pointType}"
+          for="event-type-${pointType}-1"
+        >
+          ${pointType[0].toUpperCase() + pointType.slice(1)}
+        </label>
+      </div>
+    `,
     ).join('');
 
     const destinationOptions = this.#destinations
@@ -91,7 +97,7 @@ export default class FormEditView extends AbstractStatefulView {
             id="event-offer-${offer.id}"
             name="event-offer-${offer.id}"
             type="checkbox"
-            ${point.offers.includes(offer.id) ? 'checked' : ''}
+            ${selectedOffers.includes(offer.id) ? 'checked' : ''}
           />
           <label
             class="event__offer-label"
@@ -119,7 +125,7 @@ export default class FormEditView extends AbstractStatefulView {
                 alt="Event type icon"
                 class="event__type-icon"
                 height="17"
-                src="img/icons/${point.type}.png"
+                src="img/icons/${type}.png"
                 width="17"
               />
             </label>
@@ -141,7 +147,7 @@ export default class FormEditView extends AbstractStatefulView {
               class="event__label event__type-output"
               for="event-destination-1"
             >
-              ${point.type[0].toUpperCase() + point.type.slice(1)}
+              ${type[0].toUpperCase() + type.slice(1)}
             </label>
             <input
               class="event__input event__input--destination"
