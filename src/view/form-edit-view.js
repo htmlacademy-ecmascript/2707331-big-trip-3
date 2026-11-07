@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPES } from '../mock/point.js';
 
 const formatDateTime = (date) => {
@@ -14,7 +14,7 @@ const formatDateTime = (date) => {
   ).slice(-2)} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
 };
 
-export default class FormEditView extends AbstractView {
+export default class FormEditView extends AbstractStatefulView {
   #point;
   #destinations;
   #offers;
@@ -221,4 +221,6 @@ export default class FormEditView extends AbstractView {
       </form>
     </li>`;
   }
+
+  _restoreHandlers() {}
 }
