@@ -14,6 +14,7 @@ export default class SortView extends AbstractView {
           name="trip-sort"
           type="radio"
           value="sort-day"
+          checked=""
         />
         <label class="trip-sort__btn" for="sort-day"> Day </label>
       </div>
@@ -40,7 +41,6 @@ export default class SortView extends AbstractView {
       </div>
       <div class="trip-sort__item trip-sort__item--price">
         <input
-          checked=""
           class="trip-sort__input visually-hidden"
           id="sort-price"
           name="trip-sort"

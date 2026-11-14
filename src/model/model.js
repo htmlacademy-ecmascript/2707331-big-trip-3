@@ -9,6 +9,37 @@ class Model {
     return this.#points;
   }
 
+  setPoints(newPoints) {
+    this.#points = newPoints;
+  }
+
+  addPoint(point) {
+    this.#points = [...this.#points, point].sort(
+      (firstPoint, secondPoint) =>
+        new Date(firstPoint.dateFrom) - new Date(secondPoint.dateFrom),
+    );
+  }
+
+  deletePoint(pointId) {
+    this.#points = this.#points.filter((point) => point.id !== pointId);
+  }
+
+  updatePoint(updatedPoint) {
+    const pointIndex = this.#points.findIndex(
+      (point) => point.id === updatedPoint.id,
+    );
+
+    if (pointIndex === -1) {
+      return;
+    }
+
+    this.#points = [
+      ...this.#points.slice(0, pointIndex),
+      updatedPoint,
+      ...this.#points.slice(pointIndex + 1),
+    ];
+  }
+
   getDestinations() {
     return this.#destinations;
   }

@@ -26,6 +26,7 @@ export default class FormEditView extends AbstractStatefulView {
   #handleTypeChange;
   #handleDestinationChange;
   #handleOfferChange;
+  #handleDeleteClick;
 
   constructor(
     point = null,
@@ -33,6 +34,7 @@ export default class FormEditView extends AbstractStatefulView {
     offers = [],
     onFormSubmit,
     onRollupClick,
+    onDeleteClick,
   ) {
     super();
 
@@ -42,6 +44,7 @@ export default class FormEditView extends AbstractStatefulView {
 
     this.#handleFormSubmit = onFormSubmit;
     this.#handleRollupClick = onRollupClick;
+    this.#handleDeleteClick = onDeleteClick;
     this.#handleTypeChange = this.#onTypeChange.bind(this);
     this.#handleDestinationChange = this.#onDestinationChange.bind(this);
     this.#handleOfferChange = this.#onOfferChange.bind(this);
@@ -229,8 +232,10 @@ export default class FormEditView extends AbstractStatefulView {
                 class="event__input event__input--price"
                 id="${this.#id}-price"
                 name="event-price"
-                type="text"
+                type="number"
+                min="0"
                 value="${this._state.basePrice ?? point.basePrice}"
+                required
               />
             </div>
 
@@ -322,6 +327,10 @@ export default class FormEditView extends AbstractStatefulView {
     this.element
       .querySelector('form')
       .addEventListener('submit', this.#handleFormSubmit);
+
+    this.element
+      .querySelector('.event__reset-btn')
+      .addEventListener('click', this.#handleDeleteClick);
 
     this.element
       .querySelector('.event__rollup-btn')
