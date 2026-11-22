@@ -1,36 +1,33 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 
-const formatDate = (date) =>
-  new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-  })
-    .format(new Date(date))
-    .toUpperCase();
+dayjs.extend(duration);
 
-const formatTime = (date) =>
-  new Intl.DateTimeFormat('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(new Date(date));
+const formatDate = (date) => dayjs(date).format('DD MMM').toUpperCase();
+
+const formatTime = (date) => dayjs(date).format('HH:mm');
 
 const formatDuration = (dateFrom, dateTo) => {
-  const duration = new Date(dateTo) - new Date(dateFrom);
-  const minutes = Math.floor(duration / 60000);
-  const days = Math.floor(minutes / 1440);
-  const hours = Math.floor((minutes % 1440) / 60);
-  const remainingMinutes = minutes % 60;
+  const difference = dayjs.duration(
+    dayjs(dateTo).diff(dayjs(dateFrom)),
+  );
+
+  const days = Math.floor(difference.asDays());
+  const hours = difference.hours();
+  const minutes = difference.minutes();
+
+  const pad = (value) => String(value).padStart(2, '0');
 
   if (days > 0) {
-    return `${days}D ${hours}H ${remainingMinutes}M`;
+    return `${pad(days)}D ${pad(hours)}H ${pad(minutes)}M`;
   }
 
   if (hours > 0) {
-    return `${hours}H ${remainingMinutes}M`;
+    return `${pad(hours)}H ${pad(minutes)}M`;
   }
 
-  return `${remainingMinutes}M`;
+  return `${minutes}M`;
 };
 
 export default class PointView extends AbstractView {

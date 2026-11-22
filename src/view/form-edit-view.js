@@ -1,18 +1,8 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPES } from '../mock/point.js';
+import dayjs from 'dayjs';
 
-const formatDateTime = (date) => {
-  if (!date) {
-    return '';
-  }
-
-  const value = new Date(date);
-  const pad = (number) => String(number).padStart(2, '0');
-
-  return `${pad(value.getDate())}/${pad(value.getMonth() + 1)}/${String(
-    value.getFullYear(),
-  ).slice(-2)} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
-};
+const formatDateTime = (date) => dayjs(date).format('DD/MM/YY HH:mm');
 
 export default class FormEditView extends AbstractStatefulView {
   #id = crypto.randomUUID();
