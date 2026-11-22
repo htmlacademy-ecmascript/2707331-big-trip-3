@@ -1,4 +1,5 @@
-import { render, remove } from '../framework/render.js';
+import { render, remove, RenderPosition } from '../framework/render.js';
+import SortView from '../view/sort-view.js';
 import PointPresenter, { UserAction } from './point-presenter.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import FormNewView from '../view/form-new-view.js';
@@ -21,7 +22,7 @@ export default class RoutePresenter {
   #container;
   #model;
   #filterModel;
-  #sortContainer;
+  #sortComponent = null;
   #sortType = 'day';
   #destinations;
   #offers;
@@ -34,7 +35,6 @@ export default class RoutePresenter {
     container,
     model,
     filterModel,
-    sortContainer,
     destinations,
     offers,
     newEventButton,
@@ -42,7 +42,6 @@ export default class RoutePresenter {
     this.#container = container;
     this.#model = model;
     this.#filterModel = filterModel;
-    this.#sortContainer = sortContainer;
     this.#destinations = destinations;
     this.#offers = offers;
     this.#newEventButton = newEventButton;
@@ -50,7 +49,15 @@ export default class RoutePresenter {
 
   init() {
     this.#filterModel.addObserver(this.#handleModelEvent);
-    this.#sortContainer.addEventListener('change', this.#handleSortChange);
+
+    this.#sortComponent = new SortView(this.#handleSortChange);
+
+    render(
+      this.#sortComponent,
+      this.#container.parentElement,
+      RenderPosition.AFTERBEGIN,
+    );
+
     this.#newEventButton.addEventListener('click', this.#handleNewEventClick);
     this.#renderPoints();
   }
@@ -110,12 +117,12 @@ export default class RoutePresenter {
     }
   }
 
-  #handleSortChange = (evt) => {
-    if (evt.target.name !== 'trip-sort') {
+  #handleSortChange = (sortType) => {
+    if (this.#sortType === sortType) {
       return;
     }
 
-    this.#sortType = evt.target.value.replace('sort-', '');
+    this.#sortType = sortType;
     this.#renderPoints();
   };
 
@@ -192,7 +199,8 @@ export default class RoutePresenter {
 
   #resetSort() {
     this.#sortType = 'day';
-    const daySort = this.#sortContainer.querySelector('#sort-day');
+    const daySort = this.#sortComponent.element.querySelector('#sort-day');
+
     if (daySort) {
       daySort.checked = true;
     }
