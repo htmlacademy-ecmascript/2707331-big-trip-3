@@ -32,6 +32,7 @@
     "last 2 Safari versions"
   ],
   "dependencies": {
-    "dayjs": "^1.11.23"
+    "dayjs": "^1.11.23",
+    "flatpickr": "^4.6.13"
   }
 }
