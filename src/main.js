@@ -16,6 +16,7 @@ const tripControlsContainer = document.querySelector('.trip-controls__filters');
 const filterPresenter = new FilterPresenter({
   container: tripControlsContainer,
   model: filterModel,
+  pointsModel: model,
 });
 filterPresenter.init();
 

@@ -1,6 +1,8 @@
+
+import Observable from '../framework/observable.js';
 import { points, destinations, offers } from '../mock/mock.js';
 
-class Model {
+class Model extends Observable {
   #points = points;
   #destinations = destinations;
   #offers = offers;
@@ -11,6 +13,7 @@ class Model {
 
   setPoints(newPoints) {
     this.#points = newPoints;
+    this._notify('change');
   }
 
   addPoint(point) {
@@ -18,10 +21,19 @@ class Model {
       (firstPoint, secondPoint) =>
         new Date(firstPoint.dateFrom) - new Date(secondPoint.dateFrom),
     );
+
+    this._notify('change');
   }
 
   deletePoint(pointId) {
-    this.#points = this.#points.filter((point) => point.id !== pointId);
+    const newPoints = this.#points.filter((point) => point.id !== pointId);
+
+    if (newPoints.length === this.#points.length) {
+      return;
+    }
+
+    this.#points = newPoints;
+    this._notify('change');
   }
 
   updatePoint(updatedPoint) {
@@ -38,6 +50,8 @@ class Model {
       updatedPoint,
       ...this.#points.slice(pointIndex + 1),
     ];
+
+    this._notify('change');
   }
 
   getDestinations() {
@@ -50,3 +64,4 @@ class Model {
 }
 
 export default Model;
+
