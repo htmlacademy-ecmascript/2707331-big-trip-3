@@ -1,4 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import flatpickr from 'flatpickr';
 import { POINT_TYPES } from '../mock/point.js';
 
 export default class FormNewView extends AbstractStatefulView {
@@ -293,6 +294,39 @@ export default class FormNewView extends AbstractStatefulView {
     this.#handleCancel();
   }
 
+  #initDatepickers() {
+    const startDateInput = this.element.querySelector(
+      '[name="event-start-time"]',
+    );
+
+    const endDateInput = this.element.querySelector(
+      '[name="event-end-time"]',
+    );
+
+    const endDatePicker = flatpickr(endDateInput, {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      time_24hr: true, // eslint-disable-line camelcase
+    });
+
+    const startDatePicker = flatpickr(startDateInput, {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      time_24hr: true, // eslint-disable-line camelcase
+      onChange: ([selectedDate]) => {
+        endDatePicker.set('minDate', selectedDate || null);
+
+        const endDate = endDatePicker.selectedDates[0];
+
+        if (selectedDate && endDate && endDate < selectedDate) {
+          endDatePicker.setDate(selectedDate, true);
+        }
+      },
+    });
+
+    endDatePicker.set('minDate', startDatePicker.selectedDates[0] || null);
+  }
+
   _restoreHandlers() {
     this.element
       .querySelector('form')
@@ -313,5 +347,7 @@ export default class FormNewView extends AbstractStatefulView {
     this.element.querySelectorAll('.event__offer-checkbox').forEach((input) => {
       input.addEventListener('change', this.#handleOfferChange);
     });
+
+    this.#initDatepickers();
   }
 }

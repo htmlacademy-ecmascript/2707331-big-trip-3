@@ -1,18 +1,10 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPES } from '../mock/point.js';
+import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
-const formatDateTime = (date) => {
-  if (!date) {
-    return '';
-  }
-
-  const value = new Date(date);
-  const pad = (number) => String(number).padStart(2, '0');
-
-  return `${pad(value.getDate())}/${pad(value.getMonth() + 1)}/${String(
-    value.getFullYear(),
-  ).slice(-2)} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
-};
+const formatDateTime = (date) => dayjs(date).format('DD/MM/YY HH:mm');
 
 export default class FormEditView extends AbstractStatefulView {
   #id = crypto.randomUUID();
@@ -323,6 +315,39 @@ export default class FormEditView extends AbstractStatefulView {
     });
   }
 
+  #initDatepickers() {
+    const startDateInput = this.element.querySelector(
+      '[name="event-start-time"]',
+    );
+
+    const endDateInput = this.element.querySelector(
+      '[name="event-end-time"]',
+    );
+
+    const endDatePicker = flatpickr(endDateInput, {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      time_24hr: true, // eslint-disable-line camelcase
+    });
+
+    const startDatePicker = flatpickr(startDateInput, {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      time_24hr: true, // eslint-disable-line camelcase
+      onChange: ([selectedDate]) => {
+        endDatePicker.set('minDate', selectedDate || null);
+
+        const endDate = endDatePicker.selectedDates[0];
+
+        if (selectedDate && endDate && endDate < selectedDate) {
+          endDatePicker.setDate(selectedDate, true);
+        }
+      },
+    });
+
+    endDatePicker.set('minDate', startDatePicker.selectedDates[0] || null);
+  }
+
   _restoreHandlers() {
     this.element
       .querySelector('form')
@@ -351,5 +376,7 @@ export default class FormEditView extends AbstractStatefulView {
       .forEach((input) =>
         input.addEventListener('change', this.#handleOfferChange),
       );
+
+    this.#initDatepickers();
   }
 }
