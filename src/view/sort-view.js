@@ -1,6 +1,21 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
 export default class SortView extends AbstractView {
+  #handleSortTypeChange;
+
+  constructor(onSortTypeChange) {
+    super();
+    this.#handleSortTypeChange = onSortTypeChange;
+
+    this.element.addEventListener('change', this.#handleChange);
+  }
+
+  #handleChange = (evt) => {
+    if (evt.target.matches('[name="trip-sort"]')) {
+      this.#handleSortTypeChange(evt.target.value.replace('sort-', ''));
+    }
+  };
+
   get template() {
     return /* HTML */ `<form
       action="#"
