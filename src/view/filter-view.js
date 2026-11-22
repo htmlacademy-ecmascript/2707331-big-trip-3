@@ -1,11 +1,14 @@
+
 import AbstractView from '../framework/view/abstract-view.js';
 
 export default class FilterView extends AbstractView {
   #onFilterChange;
+  #availableFilters;
 
-  constructor(onFilterChange, activeFilter) {
+  constructor(onFilterChange, activeFilter, availableFilters) {
     super();
     this.#onFilterChange = onFilterChange;
+    this.#availableFilters = availableFilters;
 
     this.element.addEventListener('change', this.#handleFilterChange);
 
@@ -46,6 +49,7 @@ export default class FilterView extends AbstractView {
           name="trip-filter"
           type="radio"
           value="future"
+          ${this.#availableFilters.future ? '' : 'disabled'}
         />
         <label class="trip-filters__filter-label" for="filter-future">
           Future
@@ -58,6 +62,7 @@ export default class FilterView extends AbstractView {
           name="trip-filter"
           type="radio"
           value="present"
+          ${this.#availableFilters.present ? '' : 'disabled'}
         />
         <label class="trip-filters__filter-label" for="filter-present">
           Present
@@ -70,12 +75,14 @@ export default class FilterView extends AbstractView {
           name="trip-filter"
           type="radio"
           value="past"
+          ${this.#availableFilters.past ? '' : 'disabled'}
         />
         <label class="trip-filters__filter-label" for="filter-past">
           Past
         </label>
       </div>
       <button class="visually-hidden" type="submit">Accept filter</button>
-    </form> `;
+    </form>`;
   }
 }
+

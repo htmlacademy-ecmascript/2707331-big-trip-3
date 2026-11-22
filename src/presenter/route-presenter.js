@@ -21,6 +21,8 @@ export default class RoutePresenter {
   #container;
   #model;
   #filterModel;
+  #sortContainer;
+  #sortType = 'day';
   #destinations;
   #offers;
   #newEventButton;
@@ -32,6 +34,7 @@ export default class RoutePresenter {
     container,
     model,
     filterModel,
+    sortContainer,
     destinations,
     offers,
     newEventButton,
@@ -39,6 +42,7 @@ export default class RoutePresenter {
     this.#container = container;
     this.#model = model;
     this.#filterModel = filterModel;
+    this.#sortContainer = sortContainer;
     this.#destinations = destinations;
     this.#offers = offers;
     this.#newEventButton = newEventButton;
@@ -46,6 +50,7 @@ export default class RoutePresenter {
 
   init() {
     this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#sortContainer.addEventListener('change', this.#handleSortChange);
     this.#newEventButton.addEventListener('click', this.#handleNewEventClick);
     this.#renderPoints();
   }
@@ -55,21 +60,64 @@ export default class RoutePresenter {
     const filter = this.#filterModel.getFilter();
     const now = new Date();
 
+    let filteredPoints = points;
+
     switch (filter) {
       case 'future':
-        return points.filter((point) => new Date(point.dateFrom) > now);
+        filteredPoints = points.filter((point) => new Date(point.dateFrom) > now);
+        break;
       case 'present':
-        return points.filter(
+        filteredPoints = points.filter(
           (point) =>
             new Date(point.dateFrom) <= now && new Date(point.dateTo) >= now,
         );
+        break;
       case 'past':
-        return points.filter((point) => new Date(point.dateTo) < now);
+        filteredPoints = points.filter((point) => new Date(point.dateTo) < now);
+        break;
       case 'everything':
       default:
-        return points;
+        break;
+    }
+
+    return this.#sortPoints(filteredPoints);
+  }
+
+  #sortPoints(points) {
+    const sortedPoints = [...points];
+
+    switch (this.#sortType) {
+      case 'time':
+        return sortedPoints.sort((firstPoint, secondPoint) => {
+          const firstDuration =
+            new Date(firstPoint.dateTo) - new Date(firstPoint.dateFrom);
+          const secondDuration =
+            new Date(secondPoint.dateTo) - new Date(secondPoint.dateFrom);
+
+          return secondDuration - firstDuration;
+        });
+      case 'price':
+        return sortedPoints.sort(
+          (firstPoint, secondPoint) =>
+            secondPoint.basePrice - firstPoint.basePrice,
+        );
+      case 'day':
+      default:
+        return sortedPoints.sort(
+          (firstPoint, secondPoint) =>
+            new Date(firstPoint.dateFrom) - new Date(secondPoint.dateFrom),
+        );
     }
   }
+
+  #handleSortChange = (evt) => {
+    if (evt.target.name !== 'trip-sort') {
+      return;
+    }
+
+    this.#sortType = evt.target.value.replace('sort-', '');
+    this.#renderPoints();
+  };
 
   #renderPoints() {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
@@ -138,12 +186,13 @@ export default class RoutePresenter {
   };
 
   #handleModelEvent = () => {
-    this.#renderPoints();
     this.#resetSort();
+    this.#renderPoints();
   };
 
   #resetSort() {
-    const daySort = document.querySelector('#sort-day');
+    this.#sortType = 'day';
+    const daySort = this.#sortContainer.querySelector('#sort-day');
     if (daySort) {
       daySort.checked = true;
     }

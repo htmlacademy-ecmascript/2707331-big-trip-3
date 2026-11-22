@@ -16,6 +16,7 @@ const tripControlsContainer = document.querySelector('.trip-controls__filters');
 const filterPresenter = new FilterPresenter({
   container: tripControlsContainer,
   model: filterModel,
+  pointsModel: model,
 });
 filterPresenter.init();
 
@@ -29,6 +30,7 @@ const routePresenter = new RoutePresenter({
   container: eventsList.element,
   model,
   filterModel,
+  sortContainer: document.querySelector('.trip-sort'),
   destinations,
   offers,
   newEventButton: document.querySelector('.trip-main__event-add-btn'),
