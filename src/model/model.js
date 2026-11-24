@@ -59,6 +59,14 @@ class Model extends Observable {
   getOffers() {
     return this.#offers;
   }
+
+  setDestinations(newDestinations) {
+    this.#destinations = newDestinations;
+  }
+
+  setOffers(newOffers) {
+    this.#offers = newOffers;
+  }
 }
 
 export default Model;
