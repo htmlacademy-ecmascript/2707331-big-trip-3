@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
-import { POINT_TYPES } from '../mock/point.js';
+import { POINT_TYPES } from '../const.js';
 
 export default class FormNewView extends AbstractStatefulView {
   #id = crypto.randomUUID();

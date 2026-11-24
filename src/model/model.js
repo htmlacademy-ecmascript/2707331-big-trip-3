@@ -1,11 +1,9 @@
-
 import Observable from '../framework/observable.js';
-import { points, destinations, offers } from '../mock/mock.js';
 
 class Model extends Observable {
-  #points = points;
-  #destinations = destinations;
-  #offers = offers;
+  #points = [];
+  #destinations = [];
+  #offers = [];
 
   getPoints() {
     return this.#points;
@@ -64,4 +62,3 @@ class Model extends Observable {
 }
 
 export default Model;
-
