@@ -4,6 +4,14 @@ import FilterModel from './model/filter-model.js';
 import EventsListView from './view/events-list-view.js';
 import RoutePresenter from './presenter/route-presenter.js';
 import Model from './model/model.js';
+import Api from './api.js';
+
+const AUTHORIZATION = `Basic ${Math.random().toString(36).substring(2)}`;
+const END_POINT = 'https://24.objects.htmlacademy.pro/big-trip';
+
+const api = new Api(END_POINT, AUTHORIZATION);
+
+void api;
 
 const model = new Model();
 const filterModel = new FilterModel();
