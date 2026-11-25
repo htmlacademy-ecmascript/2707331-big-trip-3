@@ -15,4 +15,21 @@ const adaptToClient = (point) => {
   return adaptedPoint;
 };
 
-export { adaptToClient };
+const adaptToServer = (point) => {
+  const adaptedPoint = {
+    ...point,
+    'date_from': point.dateFrom,
+    'date_to': point.dateTo,
+    'base_price': point.basePrice,
+    'is_favorite': point.isFavorite,
+  };
+
+  delete adaptedPoint.dateFrom;
+  delete adaptedPoint.dateTo;
+  delete adaptedPoint.basePrice;
+  delete adaptedPoint.isFavorite;
+
+  return adaptedPoint;
+};
+
+export { adaptToClient, adaptToServer };

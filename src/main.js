@@ -15,7 +15,7 @@ const END_POINT = 'https://24.objects.htmlacademy.pro/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
-const model = new Model();
+const model = new Model(api);
 const filterModel = new FilterModel();
 
 const tripControlsContainer = document.querySelector('.trip-controls__filters');
