@@ -27,6 +27,7 @@ const filterPresenter = new FilterPresenter({
 filterPresenter.init();
 
 const tripEventsContainer = document.querySelector('.trip-events');
+const tripInfoContainer = document.querySelector('.trip-main__trip-info');
 
 const loadingView = new ListLoadingView();
 render(loadingView, tripEventsContainer);
@@ -48,6 +49,7 @@ Promise.all([
 
     const routePresenter = new RoutePresenter({
       container: eventsList.element,
+      tripInfoContainer,
       model,
       filterModel,
       destinations: model.getDestinations(),
