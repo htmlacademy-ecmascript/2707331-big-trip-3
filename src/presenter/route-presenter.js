@@ -1,9 +1,15 @@
-import { render, remove, RenderPosition } from '../framework/render.js';
+import {
+  render,
+  remove,
+  replace,
+  RenderPosition,
+} from '../framework/render.js';
 import SortView from '../view/sort-view.js';
 import PointPresenter, { UserAction } from './point-presenter.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import FormNewView from '../view/form-new-view.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import TripInfoView from '../view/trip-info-view.js';
 
 const parseDateTime = (value) => {
   const [date, time] = value.split(' ');
@@ -21,6 +27,8 @@ const parseDateTime = (value) => {
 
 export default class RoutePresenter {
   #container;
+  #tripInfoContainer;
+  #tripInfoView = null;
   #model;
   #filterModel;
   #sortComponent = null;
@@ -38,6 +46,7 @@ export default class RoutePresenter {
 
   constructor({
     container,
+    tripInfoContainer,
     model,
     filterModel,
     destinations,
@@ -45,6 +54,7 @@ export default class RoutePresenter {
     newEventButton,
   }) {
     this.#container = container;
+    this.#tripInfoContainer = tripInfoContainer;
     this.#model = model;
     this.#filterModel = filterModel;
     this.#destinations = destinations;
@@ -66,7 +76,24 @@ export default class RoutePresenter {
     );
 
     this.#newEventButton.addEventListener('click', this.#handleNewEventClick);
+    this.#renderTripInfo();
     this.#renderPoints();
+  }
+
+  #renderTripInfo() {
+    const tripInfoView = new TripInfoView(
+      this.#model.getPoints(),
+      this.#destinations,
+      this.#offers,
+    );
+
+    if (this.#tripInfoView) {
+      replace(tripInfoView, this.#tripInfoView);
+    } else {
+      render(tripInfoView, this.#tripInfoContainer);
+    }
+
+    this.#tripInfoView = tripInfoView;
   }
 
   #getPoints() {
@@ -207,6 +234,7 @@ export default class RoutePresenter {
 
   #handleModelEvent = () => {
     this.#resetSort();
+    this.#renderTripInfo();
     this.#renderPoints();
   };
 
