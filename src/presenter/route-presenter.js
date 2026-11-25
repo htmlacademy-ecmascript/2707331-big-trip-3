@@ -50,6 +50,8 @@ export default class RoutePresenter {
   init() {
     this.#filterModel.addObserver(this.#handleModelEvent);
 
+    this.#model.addObserver(this.#handleModelEvent);
+
     this.#sortComponent = new SortView(this.#handleSortChange);
 
     render(
@@ -178,7 +180,7 @@ export default class RoutePresenter {
     switch (action) {
       case UserAction.UPDATE:
         this.#model.updatePoint(point);
-        break;
+        return;
       case UserAction.ADD:
         this.#model.addPoint(point);
         break;

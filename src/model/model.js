@@ -1,11 +1,16 @@
-
 import Observable from '../framework/observable.js';
-import { points, destinations, offers } from '../mock/mock.js';
+import { adaptToClient, adaptToServer } from '../adapters/point.js';
 
 class Model extends Observable {
-  #points = points;
-  #destinations = destinations;
-  #offers = offers;
+  #points = [];
+  #destinations = [];
+  #offers = [];
+  #api;
+
+  constructor(api) {
+    super();
+    this.#api = api;
+  }
 
   getPoints() {
     return this.#points;
@@ -37,21 +42,26 @@ class Model extends Observable {
   }
 
   updatePoint(updatedPoint) {
-    const pointIndex = this.#points.findIndex(
-      (point) => point.id === updatedPoint.id,
-    );
+    return this.#api.updatePoint(adaptToServer(updatedPoint))
+      .then((response) => {
+        const adaptedPoint = adaptToClient(response);
 
-    if (pointIndex === -1) {
-      return;
-    }
+        const pointIndex = this.#points.findIndex(
+          (point) => point.id === adaptedPoint.id,
+        );
 
-    this.#points = [
-      ...this.#points.slice(0, pointIndex),
-      updatedPoint,
-      ...this.#points.slice(pointIndex + 1),
-    ];
+        if (pointIndex === -1) {
+          return;
+        }
 
-    this._notify('change');
+        this.#points = [
+          ...this.#points.slice(0, pointIndex),
+          adaptedPoint,
+          ...this.#points.slice(pointIndex + 1),
+        ];
+
+        this._notify('change');
+      });
   }
 
   getDestinations() {
@@ -61,7 +71,14 @@ class Model extends Observable {
   getOffers() {
     return this.#offers;
   }
+
+  setDestinations(newDestinations) {
+    this.#destinations = newDestinations;
+  }
+
+  setOffers(newOffers) {
+    this.#offers = newOffers;
+  }
 }
 
 export default Model;
-
