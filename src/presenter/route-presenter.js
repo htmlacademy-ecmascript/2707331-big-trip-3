@@ -73,7 +73,9 @@ export default class RoutePresenter {
 
     switch (filter) {
       case 'future':
-        filteredPoints = points.filter((point) => new Date(point.dateFrom) > now);
+        filteredPoints = points.filter(
+          (point) => new Date(point.dateFrom) > now,
+        );
         break;
       case 'present':
         filteredPoints = points.filter(
@@ -180,18 +182,14 @@ export default class RoutePresenter {
     switch (action) {
       case UserAction.UPDATE:
         this.#model.updatePoint(point);
-        return;
+        break;
       case UserAction.ADD:
-        this.#model.addPoint(point);
-        break;
+        return this.#model.addPoint(point);
       case UserAction.DELETE:
-        this.#model.deletePoint(point.id);
-        break;
+        return this.#model.deletePoint(point.id);
       default:
-        return;
+        break;
     }
-
-    this.#renderPoints();
   };
 
   #handleModelEvent = () => {
@@ -245,7 +243,6 @@ export default class RoutePresenter {
     }
 
     const point = {
-      id: crypto.randomUUID(),
       type: formData.get('event-type'),
       destination: destination.id,
       dateFrom: parseDateTime(formData.get('event-start-time')),
@@ -255,8 +252,9 @@ export default class RoutePresenter {
       isFavorite: false,
     };
 
-    this.#handlePointChange(UserAction.ADD, point);
-    this.#closeNewPointForm();
+    this.#handlePointChange(UserAction.ADD, point)
+      .then(() => this.#closeNewPointForm())
+      .catch(() => {});
   };
 
   #closeNewPointForm = () => {

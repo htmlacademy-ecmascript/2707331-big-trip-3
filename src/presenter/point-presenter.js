@@ -115,7 +115,8 @@ export default class PointPresenter {
 
   #handleDeleteClick = (evt) => {
     evt.preventDefault();
-    this.#onDataChange(UserAction.DELETE, this.#point);
+    this.#onDataChange(UserAction.DELETE, this.#point)
+      .catch(() => {});
   };
 
   #handleEditFormRollupClick = () => {

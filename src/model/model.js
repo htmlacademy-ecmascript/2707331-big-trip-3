@@ -22,23 +22,31 @@ class Model extends Observable {
   }
 
   addPoint(point) {
-    this.#points = [...this.#points, point].sort(
-      (firstPoint, secondPoint) =>
-        new Date(firstPoint.dateFrom) - new Date(secondPoint.dateFrom),
-    );
+    return this.#api.addPoint(adaptToServer(point))
+      .then((response) => {
+        const adaptedPoint = adaptToClient(response);
 
-    this._notify('change');
+        this.#points = [...this.#points, adaptedPoint].sort(
+          (firstPoint, secondPoint) =>
+            new Date(firstPoint.dateFrom) - new Date(secondPoint.dateFrom),
+        );
+
+        this._notify('change');
+      });
   }
 
   deletePoint(pointId) {
-    const newPoints = this.#points.filter((point) => point.id !== pointId);
+    const point = this.#points.find((item) => item.id === pointId);
 
-    if (newPoints.length === this.#points.length) {
-      return;
+    if (!point) {
+      return Promise.resolve();
     }
 
-    this.#points = newPoints;
-    this._notify('change');
+    return this.#api.deletePoint(point)
+      .then(() => {
+        this.#points = this.#points.filter((item) => item.id !== pointId);
+        this._notify('change');
+      });
   }
 
   updatePoint(updatedPoint) {
