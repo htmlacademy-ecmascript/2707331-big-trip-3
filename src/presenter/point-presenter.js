@@ -115,8 +115,7 @@ export default class PointPresenter {
 
   #handleDeleteClick = (evt) => {
     evt.preventDefault();
-    this.#onDataChange(UserAction.DELETE, this.#point)
-      .catch(() => {});
+    return this.#onDataChange(UserAction.DELETE, this.#point);
   };
 
   #handleEditFormRollupClick = () => {
@@ -154,7 +153,7 @@ export default class PointPresenter {
       offers: selectedOffers,
     };
 
-    this.#onDataChange(UserAction.UPDATE, updatedPoint);
+    return this.#onDataChange(UserAction.UPDATE, updatedPoint);
   };
 
   #handleEscKeydown = (evt) => {

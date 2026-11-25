@@ -320,9 +320,7 @@ export default class FormEditView extends AbstractStatefulView {
       '[name="event-start-time"]',
     );
 
-    const endDateInput = this.element.querySelector(
-      '[name="event-end-time"]',
-    );
+    const endDateInput = this.element.querySelector('[name="event-end-time"]');
 
     const endDatePicker = flatpickr(endDateInput, {
       enableTime: true,
@@ -348,14 +346,66 @@ export default class FormEditView extends AbstractStatefulView {
     endDatePicker.set('minDate', startDatePicker.selectedDates[0] || null);
   }
 
+  setSaving() {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    const deleteButton = this.element.querySelector('.event__reset-btn');
+
+    saveButton.disabled = true;
+    deleteButton.disabled = true;
+    saveButton.textContent = 'Saving...';
+  }
+
+  setDeleting() {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    const deleteButton = this.element.querySelector('.event__reset-btn');
+
+    saveButton.disabled = true;
+    deleteButton.disabled = true;
+    deleteButton.textContent = 'Deleting...';
+  }
+
+  setAborting() {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    const deleteButton = this.element.querySelector('.event__reset-btn');
+
+    saveButton.disabled = false;
+    deleteButton.disabled = false;
+    saveButton.textContent = 'Save';
+    deleteButton.textContent = 'Delete';
+
+    this.shake();
+  }
+
+  #onFormSubmit = async (evt) => {
+    evt.preventDefault();
+    this.setSaving();
+
+    try {
+      await this.#handleFormSubmit(evt);
+    } catch {
+      this.setAborting();
+    }
+  };
+
+  #onDeleteClick = async (evt) => {
+    evt.preventDefault();
+    this.setDeleting();
+
+    try {
+      await this.#handleDeleteClick(evt);
+    } catch {
+      this.setAborting();
+    }
+  };
+
   _restoreHandlers() {
     this.element
       .querySelector('form')
-      .addEventListener('submit', this.#handleFormSubmit);
+      .addEventListener('submit', this.#onFormSubmit);
 
     this.element
       .querySelector('.event__reset-btn')
-      .addEventListener('click', this.#handleDeleteClick);
+      .addEventListener('click', this.#onDeleteClick);
 
     this.element
       .querySelector('.event__rollup-btn')
