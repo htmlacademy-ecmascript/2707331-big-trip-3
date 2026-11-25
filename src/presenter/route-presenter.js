@@ -3,6 +3,7 @@ import SortView from '../view/sort-view.js';
 import PointPresenter, { UserAction } from './point-presenter.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import FormNewView from '../view/form-new-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const parseDateTime = (value) => {
   const [date, time] = value.split(' ');
@@ -30,6 +31,10 @@ export default class RoutePresenter {
   #pointPresenters = [];
   #emptyView = null;
   #newPointView = null;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: 0,
+    upperLimit: 0,
+  });
 
   constructor({
     container,
@@ -73,7 +78,9 @@ export default class RoutePresenter {
 
     switch (filter) {
       case 'future':
-        filteredPoints = points.filter((point) => new Date(point.dateFrom) > now);
+        filteredPoints = points.filter(
+          (point) => new Date(point.dateFrom) > now,
+        );
         break;
       case 'present':
         filteredPoints = points.filter(
@@ -177,21 +184,25 @@ export default class RoutePresenter {
   };
 
   #handlePointChange = (action, point) => {
+    this.#uiBlocker.block();
+
+    let request;
+
     switch (action) {
       case UserAction.UPDATE:
-        this.#model.updatePoint(point);
-        return;
+        request = this.#model.updatePoint(point);
+        break;
       case UserAction.ADD:
-        this.#model.addPoint(point);
+        request = this.#model.addPoint(point);
         break;
       case UserAction.DELETE:
-        this.#model.deletePoint(point.id);
+        request = this.#model.deletePoint(point.id);
         break;
       default:
-        return;
+        request = Promise.resolve();
     }
 
-    this.#renderPoints();
+    return request.finally(() => this.#uiBlocker.unblock());
   };
 
   #handleModelEvent = () => {
@@ -245,7 +256,6 @@ export default class RoutePresenter {
     }
 
     const point = {
-      id: crypto.randomUUID(),
       type: formData.get('event-type'),
       destination: destination.id,
       dateFrom: parseDateTime(formData.get('event-start-time')),
@@ -255,8 +265,9 @@ export default class RoutePresenter {
       isFavorite: false,
     };
 
-    this.#handlePointChange(UserAction.ADD, point);
-    this.#closeNewPointForm();
+    return this.#handlePointChange(UserAction.ADD, point).then(() =>
+      this.#closeNewPointForm(),
+    );
   };
 
   #closeNewPointForm = () => {

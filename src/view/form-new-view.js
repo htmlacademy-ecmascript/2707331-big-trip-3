@@ -284,10 +284,17 @@ export default class FormNewView extends AbstractStatefulView {
     this._setState({ offers });
   }
 
-  #onSubmit(evt) {
+  #onSubmit = async (evt) => {
     evt.preventDefault();
-    this.#handleSubmit(new FormData(evt.target), this._state);
-  }
+
+    this.setSaving();
+
+    try {
+      await this.#handleSubmit(new FormData(evt.target), this._state);
+    } catch {
+      this.setAborting();
+    }
+  };
 
   #onCancel(evt) {
     evt.preventDefault();
@@ -299,9 +306,7 @@ export default class FormNewView extends AbstractStatefulView {
       '[name="event-start-time"]',
     );
 
-    const endDateInput = this.element.querySelector(
-      '[name="event-end-time"]',
-    );
+    const endDateInput = this.element.querySelector('[name="event-end-time"]');
 
     const endDatePicker = flatpickr(endDateInput, {
       enableTime: true,
@@ -325,6 +330,26 @@ export default class FormNewView extends AbstractStatefulView {
     });
 
     endDatePicker.set('minDate', startDatePicker.selectedDates[0] || null);
+  }
+
+  setSaving() {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    const cancelButton = this.element.querySelector('.event__reset-btn');
+
+    saveButton.disabled = true;
+    cancelButton.disabled = true;
+    saveButton.textContent = 'Saving...';
+  }
+
+  setAborting() {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    const cancelButton = this.element.querySelector('.event__reset-btn');
+
+    saveButton.disabled = false;
+    cancelButton.disabled = false;
+    saveButton.textContent = 'Save';
+
+    this.shake();
   }
 
   _restoreHandlers() {
